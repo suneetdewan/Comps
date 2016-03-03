@@ -1,6 +1,13 @@
-## Regression on dataset that removes all non-response
+## Suneet Dewan
+## Founding to Fortune: The Effect of Human Capital on Entrepreneurial Success
+
+# The first part is comprised on regression codes on the main dataset, ie, one where all the non-response are removed
+# Near the end, I added the code for the regressions on the dataset including the 86 who come back
+
+
 
 WaveB <- read.csv("clean_npremoved.csv")
+dataB <- read.csv("clean_include_waveB_skips.csv")
 
 # Remove the observations with empty Education
 WaveB <- WaveB[-375,]
@@ -36,7 +43,7 @@ summary(survive3_logit_3)
 survive3_logit <- glm(survive_3 ~ education_smaller + work_experience + manager_exp + entrep_exp + industry_exp + major_reason + white + parents + Gender + alone_or_not + net_worth:net_worth_dummy + code + X35hours + REGIONA, data = WaveB, family = 'binomial', weights = WaveB$Weight)
 summary(survive3_logit)
 
-
+anova()
 anova(survive3_logit_0, survive3_logit, test = "Chisq")
 
 
@@ -96,3 +103,28 @@ anova(rev3_logit_0, rev3_logit, test = "Chisq")
 # Checking multi-collinearity
 library(car)
 vif(survive3_logit)
+
+
+
+
+
+
+## Secondary Regression run on the dataset where the 86 respondents who come back are added
+
+
+dataB <- data[-160,]
+dataB$code <- factor(dataB$industry_code)
+dataB$education_smaller <- factor(dataB$education_smaller, levels = c("High School or Below", "Some college", "Bachelors degree", "Graduate degree"))
+which(! complete.cases(dataB))
+dataB <- dataB[-c(39, 160, 219, 388, 546, 589, 811, 847, 936)]
+
+survive_C_logit <- glm(survive_3 ~ education_smaller + work_experience + manager_exp + entrep_exp + industry_exp + major_reason + white + parents + Gender + alone_or_not + net_worth:net_worth_dummy + code + X35hours + REGIONA, data = dataB, family = 'binomial', weights = dataB$Weight_C)
+summary(survive_C_logit)
+
+rev_C_logit <- glm(rev ~ education_smaller + work_experience + manager_exp + entrep_exp + industry_exp + major_reason + white + parents + Gender + alone_or_not + net_worth:net_worth_dummy + code + X35hours + REGIONA, data = dataB, family = 'binomial', weights = dataB$Weight_C)
+summary(rev_C_logit)
+
+profit_C_logit <- glm(profit ~ education_smaller + work_experience + manager_exp + entrep_exp + industry_exp + major_reason + white + parents + Gender + alone_or_not + net_worth:net_worth_dummy + code + X35hours + REGIONA, data = dataB, family = 'binomial', weights = dataB$Weight_C)
+summary(profit_C_logit)
+
+
